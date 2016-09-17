@@ -1,0 +1,17 @@
+:root {
+  --scale: 0;
+
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;  /* Firefox */
+  image-rendering: -o-crisp-edges;    /* Opera */
+  image-rendering: -webkit-optimize-contrast; /*Webkit ? */
+  image-rendering: crisp-edges;
+
+  -ms-interpolation-mode: nearest-neighbor; /* IE */
+}
+
+body {
+  background-color: black;
+  margin:0;
+  overflow: hidden;;
+}
