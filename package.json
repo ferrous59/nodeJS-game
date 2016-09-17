@@ -2,6 +2,9 @@
   "name": "node.js-game",
   "version": "1.0.0",
   "description": "html5 game",
+  "engines": {
+    "node": "4.5.0"
+  },
   "main": "bin/app.js",
   "scripts": {
     "start": "node bin/app.js",
