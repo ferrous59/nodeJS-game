@@ -1,20 +1,36 @@
 var express = require('express');
 var app = express();
 var path = require('path');
-var html = require('html');
+
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+var PLAYER_CLASSES = ["ranger","bard","cheesedwarf","rogue","dragonknight","pyromancer","druid"];
 
 app.use(express.static(path.join(__dirname, '/../public')));
 
-app.engine('.html', require('ejs').__express);
-//app.set('views', path.join(__dirname + "/../public"));
-app.set('view engine', 'html');
-
 app.get('/', function (req, res) {
-  //res.send('Hello World');
-  //res.sendFile(path.join(__dirname, '../public/index.html'));
-  //res.render('index');
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-app.listen(process.env.PORT || 3000, function() {
-  console.log("DON'T PANIC")
+io.on('connection', function(socket){
+  console.log('a user has connected:\t\t'+socket.id);
+
+  // send to all other sockets
+  //count++;
+  //socket.broadcast.emit('update', count);
+
+  socket.on('disconnect', function(){
+    console.log('a user has disconnected:\t'+socket.id);
+  });
+});
+
+io.on('message', function(message) {
+  console.log(message);
+});
+
+//app.listen ...
+http.listen(process.env.PORT || 3000, function() {
+  console.log(process.env.PORT);
+  console.log("DON'T PANIC");
 });

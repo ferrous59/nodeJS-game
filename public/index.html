@@ -15,7 +15,14 @@
     </canvas>
 
     <!-- Scripts -->
-    <script type="text/javascript" src="js/constants.js"></script>
-    <script type="text/javascript" src="js/client.js"></script>
+    <script data-main="js/main" src="js/lib/require.js" async></script>
+    <!--script data-main="main" src="js/main.js" async></script-->
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+    </script>
+
+    <!--script type="text/javascript" src="js/constants.js"></script>
+    <script type="text/javascript" src="js/client.js"></script-->
   </body>
 </html>

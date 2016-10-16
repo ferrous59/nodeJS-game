@@ -1,19 +1,12 @@
-var stage = document.getElementById("gameCanvas");
-stage.width = STAGE_W;
-stage.height = STAGE_H;
+/*automatic: var socket = io.connect('http://localhost:3000');*/
+socket.on('connect', function() {
+  console.log('client connected');
+});
 
-var canvas = stage.getContext("2d");
+socket.on('update', function(text) {
+  console.log(text);
+});
 
-canvas.fillStyle = "#ffffff";
-canvas.fillRect(0,0, stage.width,stage.height);
-
-// loading screen
-canvas.fillStyle = "#000000";
-canvas.font = GAME_FONT;
-canvas.fillText("loading...", STAGE_W/2-50, STAGE_H/2);
-
-// enable jazzy pixel art stylings
-canvas.mozImageSmoothingEnabled = false;
-canvas.webkitImageSmoothingEnabled = false; // may be depreciated (replaced by imageSmoothingEnabled?)
-canvas.msImageSmoothingEnabled = false;
-canvas.imageSmoothingEnabled = false;
+socket.on('message', function(message) {
+  console.log(message);
+});
