@@ -19,14 +19,14 @@ io.on('connection', function(socket){
 
   //setInterval(function(){ io.emit('message', 'welcolme, newcomer'); }, 3000);
   setInterval(function() {
-    if(truePos <= 200){
+    if(truePos <= 50 ){
     truePos += 1;
     io.emit('moveCharTo', truePos);
   }
   },200);
   //temporaty
   socket.on('moveChar', function (x) {
-    truePos += x;
+    if(truePos >= 0) truePos += x;
     io.emit('moveCharTo', truePos);
   });
 

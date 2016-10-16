@@ -27,7 +27,7 @@ define(function(require) {
 
   window.addEventListener('keydown', function(event) {
     console.log(entity.position.x + ":" + entity.position.y);
-    socket.emit('moveChar', -1);
+    socket.emit('moveChar', -10);
   }, false);
 
   socket.on('moveChar', function(x) {

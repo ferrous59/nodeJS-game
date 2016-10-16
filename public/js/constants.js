@@ -3,8 +3,8 @@ define({
   // SYSTEM VALUES
   //---------------
   SCALE   : 5,
-  STAGE_W : Math.max(document.documentElement.clientWidth, window.innerWidth || 600),
-  STAGE_H : Math.max(document.documentElement.clientHeight, window.innerHeight || 400),
+  STAGE_W : 600,//Math.max(document.documentElement.clientWidth, window.innerWidth || 600),
+  STAGE_H : 400,//Math.max(document.documentElement.clientHeight, window.innerHeight || 400),
   PHYSICS : 15,
   UPDATE  : 45,
   GAME_FONT : "bold 20px sans-serif",
