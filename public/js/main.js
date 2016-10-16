@@ -1,8 +1,11 @@
 // main.js
-require(['client', 'js/client.js'], function(){
-  console.log('client.js loaded');
+require.config({
+  baseurl:"js/lib", // external libraries
+  paths: {          // extra paths I guess?
+
+  }
 });
 
-requirejs(['constants', 'js/constants.js'], function(){
-  console.log('client.js loaded');
+require(['client','constants'], function(){
+  console.log('game loaded');
 });

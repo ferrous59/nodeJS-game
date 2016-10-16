@@ -5,20 +5,30 @@ var path = require('path');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var PLAYER_CLASSES = ["ranger","bard","cheesedwarf","rogue","dragonknight","pyromancer","druid"];
 
 app.use(express.static(path.join(__dirname, '/../public')));
 
 app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(__dirname, '../publc/index.html'));
 });
 
+// temporary
+var truePos = 0;
 io.on('connection', function(socket){
   console.log('a user has connected:\t\t'+socket.id);
 
-  // send to all other sockets
-  //count++;
-  //socket.broadcast.emit('update', count);
+  //setInterval(function(){ io.emit('message', 'welcolme, newcomer'); }, 3000);
+  setInterval(function() {
+    if(truePos <= 200){
+    truePos += 1;
+    io.emit('moveCharTo', truePos);
+  }
+  },200);
+  //temporaty
+  socket.on('moveChar', function (x) {
+    truePos += x;
+    io.emit('moveCharTo', truePos);
+  });
 
   socket.on('disconnect', function(){
     console.log('a user has disconnected:\t'+socket.id);

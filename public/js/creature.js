@@ -1,10 +1,10 @@
 // creature.js
-define(["./entity"], {
-  var entity = require('entity.js');
-
-  var creature = {
-    skin:entity,
-    health:100,
-
+define('creature',['entity', 'constants'], function(entity, c) {
+  sprite:entity,
+  health:100,
+  armour:100,
+  move: function (x, y) {
+    sprite.position.x += x * c.SCALE;
+    sprite.position.y += y * c.SCALE;
   }
 });
