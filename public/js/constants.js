@@ -1,39 +1,39 @@
-define({
-  //---------------
-  // SYSTEM VALUES
-  //---------------
-  SCALE   : 5,
-  STAGE_W : 600,//Math.max(document.documentElement.clientWidth, window.innerWidth || 600),
-  STAGE_H : 400,//Math.max(document.documentElement.clientHeight, window.innerHeight || 400),
-  PHYSICS : 15,
-  UPDATE  : 45,
-  GAME_FONT : "bold 20px sans-serif",
-  STAGE :  document.getElementById("gameCanvas"),
-  CANVAS : document.getElementById("gameCanvas").getContext("2d"),
+define(['canvas'], function(Canvas){
+  var system = {
+    //---------------
+    // SYSTEM VALUES
+    //---------------
+    SCALE   : 5,
+    TILESIZE: 16,
+    STAGE_W : 600,//Math.max(document.documentElement.clientWidth, window.innerWidth || 600),
+    STAGE_H : 400,//Math.max(document.documentElement.clientHeight, window.innerHeight || 400),
+    PHYSICS : 15, //ms
+    UPDATE  : 45, //ms
+    GAME_FONT : "bold 20px sans-serif", // will need to be replaced by custom font
+    STAGE : null, //document.getElementById("gameCanvas"),
+    CANVAS : null,//document.getElementById("gameCanvas").getContext("2d"),
 
-  //---------------
-  // RENDERING
-  //---------------
-  SETUP_CANVAS : function() {
-    STAGE = document.getElementById("gameCanvas");
+    //---------------
+    // RENDERING
+    //---------------
+    SETUP_CANVAS : function() {
+      this.STAGE = document.getElementById("gameCanvas");;
 
-    STAGE.width = this.STAGE_W;
-    STAGE.height = this.STAGE_H;
+      this.STAGE.width = this.STAGE_W;
+      this.STAGE.height = this.STAGE_H;
 
-    CANVAS = STAGE.getContext("2d");
+      this.CANVAS = new Canvas(this.STAGE);
 
-    CANVAS.fillStyle = "#ffffff";
-    CANVAS.fillRect(0,0, this.STAGE_W, this.STAGE_H);
+      this.CANVAS.scale(this.SCALE,this.SCALE);
 
-    // loading screen
-    CANVAS.fillStyle = "#000000";
-    CANVAS.font = this.GAME_FONT;
-    CANVAS.fillText("loading...", this.STAGE_W/2-50, this.STAGE_H/2);
+      this.CANVAS.fillStyle = "#ffffff";
+      this.CANVAS.fillRect(0,0, this.STAGE_W, this.STAGE_H);
 
-    // enable jazzy pixel art stylings
-    CANVAS.mozImageSmoothingEnabled = false;
-    CANVAS.webkitImageSmoothingEnabled = false; // may be depreciated (replaced by imageSmoothingEnabled?)
-    CANVAS.msImageSmoothingEnabled = false;
-    CANVAS.imageSmoothingEnabled = false;
+      // loading screen
+      this.CANVAS.fillStyle = "#000000";
+      this.CANVAS.font = this.GAME_FONT;
+      this.CANVAS.fillText("loading...", this.STAGE_W/2-50, this.STAGE_H/2);
+    }
   }
+  return system;
 });
