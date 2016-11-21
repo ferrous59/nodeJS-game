@@ -37,8 +37,8 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
     var sx = sprite.sPosition.x,
         sy = sprite.sPosition.y,
-        sw = sprite.dimensions.x,
-        sh = sprite.dimensions.y,
+        sw = sprite.width,
+        sh = sprite.height,
         dx = Math.round(sprite.position.x),
         dy = Math.round(sprite.position.y),
         dw = sw,
@@ -46,8 +46,8 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
     // animation
     if(sprite.animation != null) {
-      sx += sprite.frame * sprite.dimensions.x;
-      sy += sprite.animation.row * sprite.dimensions.y;
+      sx += sprite.frame * sprite.width;
+      sy += sprite.animation.row * sprite.height;
     }
 
     if(sprite.isLoaded && !this.debug) {
@@ -112,12 +112,11 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     //for(var j = 0; j < this.static.length + this.entities.length; j++)
     unknown.forEach(function(current) {
       var x = current.position.x,
-          y = current.position.y,
-          dim = current.dimensions,
-          xA = x - this.width/2 - dim.x,
-          xB = x + this.width/2 + dim.x,
-          yA = y - this.height/2 - dim.y,
-          yB = y + this.height/2 - dim.y;
+          y = current.position.y+current.height,
+          xA = x - this.width/2 - current.width,
+          xB = x + this.width/2 + current.width,
+          yA = y - this.height/2 - current.height,
+          yB = y + this.height/2 - current.height;
 
       var insert = function(min, current) {
         visible.splice(min,0,current);
@@ -133,7 +132,7 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
           for(var k = 0; k < 200; k ++) {
             mid = Math.round((max-min)/2 - 0.5); // must round down
-            if(visible[mid] != null) { z_mid = visible[mid].position.y; }
+            if(visible[mid] != null) { z_mid = visible[mid].position.y + visible[mid].height; }
             else { _zmid = 0; }
 
             if(max == min || z_mid == y) { insert(min,current); k = 200; }

@@ -2,7 +2,8 @@
   "name": "default",
   "src":"null.png",
   "sPosition":{"x":0, "y":0},
-  "dimensions":{"x":16, "y":16},
+  "width":16,
+  "height":16,
   "center":{"x":8, "y":8},
   "animations": {
     "idle_S":{"row":0,"length":2,"timing":[200,200]}
