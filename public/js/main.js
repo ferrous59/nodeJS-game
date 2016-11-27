@@ -8,14 +8,12 @@ require.config({
 
 var client = require(['client'], function(){
   console.log('game loaded');
-  console.log(client);
-  
+
 });
 
 function debugMode(bool) {
-  console.log(client);
-  console.log(client.Renderer);
   if(client.renderer != null) {
+    client.canvas.clearRect();
     client.renderer.debug = bool;
     return 'success';
   }

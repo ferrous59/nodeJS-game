@@ -2,7 +2,8 @@
 // list all JSON, push each into a struct called sprites, which we can use to load JSON by name
 define(['text!JSON/sprites/default.json',
         'text!JSON/sprites/druid.json',
-        'text!JSON/tiles/floorboards.json'], function () {
+        'text!JSON/tiles/sconce.json',
+        'text!JSON/tiles/tile.json'], function () {
 
   var sprites = {};
   var dependencies = Array.prototype.slice.call(arguments);

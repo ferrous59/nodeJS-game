@@ -1,0 +1,7 @@
+{
+  "name": "tile",
+  "src":"tiles.png",
+  "sPosition":{"x":0, "y":32},
+  "width":16,
+  "height":16
+}

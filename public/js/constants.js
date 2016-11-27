@@ -3,10 +3,10 @@ define(['canvas'], function(Canvas){
     //---------------
     // SYSTEM VALUES
     //---------------
-    SCALE   : 5,
     TILESIZE: 16,
-    STAGE_W : 600,//Math.max(document.documentElement.clientWidth, window.innerWidth || 600),
-    STAGE_H : 400,//Math.max(document.documentElement.clientHeight, window.innerHeight || 400),
+    STAGE_W : Math.max(document.documentElement.clientWidth, window.innerWidth || 600),
+    STAGE_H : Math.max(document.documentElement.clientHeight, window.innerHeight || 400),
+    SCALE   : 5,
     PHYSICS : 15, //ms
     UPDATE  : 45, //ms
     GAME_FONT : "bold 20px sans-serif", // will need to be replaced by custom font

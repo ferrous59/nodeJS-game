@@ -24,7 +24,6 @@ define(['sprites'], function (Sprites) {
 
     this.name = data.name;
 
-    this.sPosition = data.sPosition;
     this.width = data.width;
     this.height = data.height;
     this.center = data.center;
@@ -37,27 +36,49 @@ define(['sprites'], function (Sprites) {
     this.image.onload = this.onLoad();
 
     // these will be accessed with anim["name"]
-    if(data.animations != null) { this.anim = data.animations; }
-    else { this.anim = {};}
+    this.anim = (data.animations != null) ? data.animations : {};
 
     // non-static
-    this.position = {"x":0, "y":0};
+    var d = data.hasOwnProperty('position') ? data.position : {"x":0, "y":0},
+        s = data.hasOwnProperty('sPosition') ? data.sPosition : {"x":0, "y":0};
+
+    this.position =  {"x":d.x, "y":d.y};
+    this.sPosition = {"x":s.x, "y":s.y};
+
     // for animation
     this.lastTick = 0;
     this.frame = 0;
     this.delay = 0; // how long till next frame?
     this.animation = null;
-    this.setAnim("idle_S");
+    this.setAnim("idle_S"); // this will always be default
   }
 
   Sprite.prototype.onLoad = function() {
      this.isLoaded = true;
   }
 
-  Sprite.prototype.setPos = function(x,y)
+  Sprite.prototype.setPos = function(x,y, offset = false)
   {
-    this.position.x = x;
-    this.position.y = y;
+    if(typeof(x) != 'number') { x = 0; }
+    if(typeof(y) != 'number') { y = 0; }
+
+    if(offset) {
+      this.position.x += x;
+      this.position.y += y;
+    }
+    else {
+      this.position.x = x;
+      this.position.y = y;
+    }
+  }
+
+  Sprite.prototype.setSource = function(x,y)
+  {
+    if(typeof(x) != 'number') { x = 0; }
+    if(typeof(y) != 'number') { y = 0; }
+
+    this.sPosition.x = x;
+    this.sPosition.y = y;
   }
 
   // set animation

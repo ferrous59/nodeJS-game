@@ -1,0 +1,11 @@
+{
+  "name": "sconce",
+  "src":"tiles.png",
+  "position":{"x":4, "y":0},
+  "sPosition":{"x":240, "y":80},
+  "width":8,
+  "height":16,
+  "animations": {
+    "idle_S":{"row":0,"length":2,"timing":[400,100]}
+  }
+}
