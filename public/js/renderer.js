@@ -1,5 +1,6 @@
 define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity, Collision, canvas) {
 
+  'use strict';
   // ctx is defined by constants.js and contains info on the canvas
   // camera is a sprite - this will eventually be the player
   function Renderer () {
@@ -11,12 +12,22 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     this.static = [];
     this.entities = [];
 
-    this.camera = {"x":60, "y":50};
-
     this.canvas = canvas.CANVAS;
-    this.width = Math.round(canvas.STAGE_W/canvas.TILESIZE +0.5); // +0.5 to always round up
-    this.height = Math.round(canvas.STAGE_H/canvas.TILESIZE +0.5);
+    this.width = Math.ceil(canvas.STAGE_W/canvas.SCALE);
+    this.height = Math.ceil(canvas.STAGE_H/canvas.SCALE);
 
+    // this.tile = function(number) { return Math.ceil(number/canvas.TILESIZE); }
+
+    // set by map loader
+    this.mapWidth =   10;
+    this.mapHeight =  10;
+
+    this.camera = {"x":100+3*16, "y":300-14*16};
+    this.x = function() { return this.camera.x - this.width/2; }
+    this.y = function() { return this.camera.y - this.height/2; }
+
+    // console.log(this.tile(this.width)+":"+this.tile(this.height));
+    //   console.log(this.width+":"+this.height);
     this.start = null;
     this.time = null;
 
@@ -40,8 +51,8 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
         sy = sprite.sPosition.y,
         sw = sprite.width,
         sh = sprite.height,
-        dx = Math.round(sprite.position.x-this.camera.x),
-        dy = Math.round(sprite.position.y-this.camera.y),
+        dx = Math.round(sprite.position.x-this.x()),
+        dy = Math.round(sprite.position.y-this.y()),
         dw = sw,
         dh = sh;
 
@@ -57,6 +68,8 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     }
 
     if((this.debug).includes("debug")) {
+      var tile = (sprite.name == 'tile' && !(this.debug).includes("all")) ? true : false;
+
       this.canvas.beginPath();
 
       var colour = "green";
@@ -66,8 +79,10 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
       this.canvas.strokeStyle = colour;
       this.canvas.lineWidth = 0.1;
 
-      this.canvas.fillStyle = "black";
-      this.canvas.fillRect(dx,dy, dw,5);
+      if(!tile){
+        this.canvas.fillStyle = "black";
+        this.canvas.fillRect(dx,dy, dw,5);
+      }
 
       if(sprite.hasOwnProperty('collider')) {
         if(sprite.isLoaded) colour = "blue";
@@ -78,77 +93,87 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
         this.canvas.moveTo(dx,dy+dh);
         this.canvas.lineTo(dx+dw,dy);
       }
-
       this.canvas.fillStyle = colour;
       this.canvas.rect(dx,dy,dw,dh);
 
-      this.canvas.font = "2px lucida console";
-      this.canvas.fillText(sprite.name+" "+dx+":"+dy,dx+2,dy+3);
-      this.canvas.stroke();
-
+      if(!tile){
+        this.canvas.font = "2px lucida console";
+        this.canvas.fillText(sprite.name+" "+dx+":"+dy,dx+2,dy+3);
+      }
       this.canvas.stroke();
     }
   }
 
   Renderer.prototype.drawTiles = function(tiles) {
-    // uses tilespace coords
-    var x = this.camera.x,
-        y = this.camera.y,
-        xA = Math.round(x - this.width/2),
-        yA = Math.round(y - this.height/2);
-        var once = true;
-    // the location of a tile is simply y*width+x
-    for(var i = 0; i < this.width*this.height; i++)
-    {
-      var _x = (i % this.width    + xA),
-          _y = (i-i % this.width)/this.width + yA,
-          index = (_x < this.width && _y < this.height) ? _y*this.width  + _x : null;
-          if(i == 4 && once ) {once = false; console.log(index + ":" + this.width + ":" + _x +":"+_y+":"+tiles[index]);}
+    // not merged with findEntities because I want to improve this. Using collision is clumsy.
+    var self = this;
 
-      if(tiles[index] != null) { this.stamp(tiles[index]); }
-    }
+    tiles.forEach(function(current) {
+      if(current == null) { return; }
+      var x = self.camera.x,
+          y = self.camera.y,
+          xA = x - self.width/2 - current.width,
+          xB = x + self.width/2 + current.width,
+          yA = y - self.height/2 - current.height,
+          yB = y + self.height/2 + current.height;
+
+      if(Collision.box(current.position.x,current.position.y, xA,xB, yA,yB) == true)
+      {
+        self.stamp(current);
+      }
+    });
   }
 
   Renderer.prototype.findEntities = function(visible, unknown) {
-    // checks collision of non-tiles - then order them by z-index (binary insert)
+    // checks collision of non-tiles - then orders them by z-index (binary insert)
+    var self = this;
+
     unknown.forEach(function(current) {
-      var x = current.position.x,
-          y = current.position.y,
-          xA = x - this.width/2 - current.width,
-          xB = x + this.width/2 + current.width,
-          yA = y - this.height/2 - current.height,
-          yB = y + this.height/2 - current.height;
+      var x = self.camera.x,
+          y = self.camera.y,
+          xA = x - self.width/2 - current.width,
+          xB = x + self.width/2 + current.width,
+          yA = y - self.height/2 - current.height,
+          yB = y + self.height/2 + current.height;
 
-      var insert = function(min, current) {
-        visible.splice(min,0,current);
-      }
-
-      if(Collision.box(x,y, xA,xB, yA,yB) == true)
+      if(Collision.box(current.position.x,current.position.y, xA,xB, yA,yB) == true)
       {
-        if(visible.length > 0) {
-          y += current.height;
+        var insert = function(mid, current) {
+          visible.splice(mid,0,current);
+        }
 
-          var max = visible.length,
+        if(visible.length > 0) {
+
+          var max = visible.length-1,
               min = 0,
+              offset = 0,
               mid = 0,
+              z = current.position.y + current.height,
               z_mid = 0,
-              kMax = 500;
+              kMax = 100;
 
           for(var k = 0; k < kMax; k ++) {
-            mid = Math.round((max+min)/2 - 0.5); // must round down
 
-            if(visible[mid] != null) {
-              z_mid = visible[mid].position.y + visible[mid].height;
-            }
+            mid = min + Math.floor((max-min)/2); // must round down
 
-            if(max == min || z_mid == y || k == kMax-1) { insert(mid,current); k = kMax;}
+            z_mid = visible[mid].position.y + visible[mid].height;
 
-            if(z_mid > y )
+            // success
+            if(max == min || z_mid == z || k == kMax-1) {
+              var final = (z > z_mid) ? max+1 : (z == z_mid) ? mid : min;
+
+              insert(final, current);
+              k = kMax;
+             }
+
+            if(z_mid > z )
             {
-              if(mid > 0) { max = mid-1; }
-              else { max = 0; }
+              max = (mid > 0) ? mid-1 : 0;
             }
-            if(z_mid < y && min < max) { min = mid+1; }
+            if(z_mid < z)
+            {
+              min = mid+1;
+            }
           }
         }
         else { insert(0, current); }
@@ -185,23 +210,32 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
       console.log("RENDERER: (" + this.time + ") error count: " + this.errors);
     }
 
+    this.canvas.fillStyle = '#222034';
+    this.canvas.fillRect(0,0,this.width,this.height);
+    // this.canvas.stroke();
+
     // more efficient than drawEntities
     this.drawTiles(this.tilesFloor);
 
     var visible = [];
+
     this.findEntities(visible, this.static);
     this.findEntities(visible, this.entities);
     this.drawEntities(visible);
 
     // <DEBUG BINARY SEARCH>
-    //   var string = "\n \n";
-    //   for (var jub = 0; jub < visible.length; jub++) {
-    //     var y = visible[jub].position.y;
-    //     if(y<10) {string += " "}
-    //     if(y<100) {string += " "}
-    //     string += " " + y;
-    //   }
-    //   console.log(visible.length+":"+string);
+      // var string = "\n \n";
+      // var string2 = "\n \n";
+      // for (var jub = 0; jub < visible.length; jub++) {
+      //   if(visible[Math.abs(jub-1)].position.y > visible[jub].position.y) { string += "\t \t \t"; }
+      //
+      //   var y = visible[jub].position.y + visible[jub].height;
+      //   if(y<10) {string += " "}
+      //   if(y<100) {string += " "}
+      //   string += " " + y;
+      // }
+      // console.log(visible.length+":"+string);
+      // console.log(visible.length+":"+string);
     // </DEBUG BINARY SEARCH>
 
     this.drawTiles(this.tilesCeiling);

@@ -1,0 +1,8 @@
+{
+  "name": "chest",
+  "src":"tiles.png",
+  "position":{"x":0, "y":0},
+  "sPosition":{"x":208, "y":80},
+  "width":16,
+  "height":16
+}

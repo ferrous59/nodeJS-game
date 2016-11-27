@@ -16,6 +16,8 @@ define(['renderer', 'sprite',
     this.spriteHeight = data.tileheight;
 
     this.renderer = (renderer == null) ? new Renderer( {"position":{"x":0,"y":0}} ) : renderer;
+    this.renderer.mapWidth = data.width*data.tilewidth;
+    this.renderer.mapHeight = data.height*data.tileheight;
 
     // for(var i = 0; i < data.layers.length; i++) {
     for(var i = (data.layers.length-1); i > -1; i-- ) {
@@ -36,6 +38,7 @@ define(['renderer', 'sprite',
 
         // this one line business is a bit indulgent, but I just learned about ternarys!
         var name = this.customTiles != null && this.customTiles.hasOwnProperty(tile) ? this.customTiles[tile] : 'tile';
+        if(name == '0') { continue; }
 
         var sprite = new Sprite(name),
             x = i % layer.width,
@@ -52,13 +55,16 @@ define(['renderer', 'sprite',
         sprite.setPos(layer.offsetx,layer.offsety,true);
         if(name == 'tile') { sprite.setSource(sx,sy); }
 
-        // console.log(x +":"+y+"::"+tile+"::"+sx+"_"+sprite.sPosition+":"+sy);
-
         // send the final tile to the place it goes
         if(destination == 'floor') { this.renderer.addFloorTile(sprite); }
         else if(destination == 'ceiling') { this.renderer.addCeilingTile(sprite); }
         else { this.renderer.addStatic(sprite); }
       }
+      // ideally, tile arrays will not use collision and must be spaced correctly
+      // else {
+      //   if(destination == 'floor') { this.renderer.addFloorTile(null); }
+      //   else if(destination == 'ceiling') { this.renderer.addCeilingTile(null); }
+      // }
     }
   }
 

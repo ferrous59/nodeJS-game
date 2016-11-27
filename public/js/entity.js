@@ -1,9 +1,10 @@
 // entity.js
 // entities must be able to move, respecting collision
-// entities must be able to despawn
+// entities must be able to spawn/despawn
 define(['sprite','sprites'], function (Sprite,sprites) {
+  'use strict';
 
-  Entity.prototype = new Sprite('default');
+  Entity.prototype = new Sprite;
   Entity.prototype.constructor = Entity;
   function Entity (name) {
     // inherit from sprite
@@ -19,12 +20,15 @@ define(['sprite','sprites'], function (Sprite,sprites) {
     var tries = 0;
     while(tries < 10)
     {
-      if( !collision(x,y) ) {
-        this.position.x = x;
-        this.position.y = y;
+      if( !this.collision(x,y) ) {
+        this.position.x += x;
+        this.position.y += y;
+        return;
       }
       else {
-
+        x -= (x-this.position.x)/tries;
+        y -= (y-this.position.y)/tries;
+        tries++;
       }
     }
   }
@@ -34,59 +38,10 @@ define(['sprite','sprites'], function (Sprite,sprites) {
     this.position.y = y;
   }
 
-  Entity.prototype.collision = function() {
+  Entity.prototype.collision = function(x,y) {
     // search for nearby colliders
     return false;
   };
 
   return Entity;
 });
-//   "use strict";
-//
-//   var Entity = {
-//         x:0,
-//         y:0
-//       };
-//       this.dimensions = {
-//         x:16,
-//         y:16
-//       }
-//     };
-//
-//     Entity.prototype = {
-//       skin: function (url) {
-//           this._skin = new Image()
-//           this._skin.src = url;
-//       },
-//       loadJSON: function(data) {
-//           this.name = data.name,
-//           this.position = data.position, // position = {x:0,y:0}
-//           this.spritePos = {
-//       },
-//       draw: function() {
-//         // canvas is defined in client.js
-//         var _sX = this.spritePos.x,
-//             _sY = this.spritePos.y,
-//             _sW = this.dimensions.x,
-//             _sH = this.dimensions.y,
-//
-//             _dX = this.position.x * c.SCALE,
-//             _dY = this.position.y * c.SCALE,
-//             _dW = _sW * c.SCALE,
-//             _dH = _sH * c.SCALE,
-//
-//         c.CANVAS.drawImage(this._skin, _sX,_sY, _sW,_sH, _dX,_dY, _dW,_dH);
-//       },
-//       move: function(x,y) {
-//         this.position.x += x;
-//         this.position.y += y;
-//       },
-//       moveTo: function(x,y) {
-//         this.position = {x:0,y:0};
-//         this.move(x,y);
-//       }
-//     }
-//   };
-//
-//   return Entity;
-// });

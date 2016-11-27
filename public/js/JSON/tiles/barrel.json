@@ -1,0 +1,8 @@
+{
+  "name": "barrel",
+  "src":"tiles.png",
+  "position":{"x":0, "y":0},
+  "sPosition":{"x":160, "y":96},
+  "width":16,
+  "height":16
+}

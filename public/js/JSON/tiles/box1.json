@@ -1,0 +1,8 @@
+{
+  "name": "box1",
+  "src":"tiles.png",
+  "position":{"x":0, "y":0},
+  "sPosition":{"x":192, "y":64},
+  "width":16,
+  "height":32
+}

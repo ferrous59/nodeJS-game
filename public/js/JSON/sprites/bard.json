@@ -1,0 +1,20 @@
+{
+  "name": "bard",
+  "src":"bard.png",
+  "sPosition":{"x":0, "y":0},
+  "width":16,
+  "height":16,
+  "center":{"x":8, "y":8},
+  "collider":{"type":"disc", "radius":8},
+  "animations": {
+    "idle_N":{"row":0,"length":1,"timing":[200]},
+    "idle_E":{"row":1,"length":1,"timing":[200]},
+    "idle_S":{"row":2,"length":1,"timing":[200]},
+    "idle_W":{"row":3,"length":1,"timing":[200]},
+
+    "walk_N":{"row":4,"length":2,"timing":[200,200]},
+    "walk_E":{"row":5,"length":2,"timing":[200,200]},
+    "walk_S":{"row":6,"length":2,"timing":[200,200]},
+    "walk_W":{"row":7,"length":2,"timing":[200,200]}
+  }
+}

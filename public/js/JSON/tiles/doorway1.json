@@ -1,0 +1,8 @@
+{
+  "name": "doorway1",
+  "src":"tiles.png",
+  "position":{"x":0, "y":0},
+  "sPosition":{"x":32, "y":160},
+  "width":32,
+  "height":32
+}
