@@ -34,13 +34,31 @@ define(['sprite','sprites'], function (Sprite,sprites) {
   }
 
   Entity.prototype.setPosition = function(x,y) {
-    this.position.x = x;
-    this.position.y = y;
+    if(!this.collsion) {
+      this.position.x = x;
+      this.position.y = y;
+    }
   }
 
   Entity.prototype.collision = function(x,y) {
     // search for nearby colliders
     return false;
+  };
+
+  Entity.prototype.emit = function() {
+    var pos = this.position,
+        anim = this.anim;
+
+    return {
+      'pos':pos,
+      'anim':anim
+    }
+  };
+
+  Entity.prototype.on = function(data) {
+    if(data != null) { return; }
+    this.setAnim(data.anim);
+    this.setPos(data.pos);
   };
 
   return Entity;

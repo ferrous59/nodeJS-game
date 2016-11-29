@@ -12,11 +12,15 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     this.static = [];
     this.entities = [];
 
-    this.canvas = canvas.CANVAS;
+    this.bufferCanvas = canvas.BUFFERSTAGE;
+    this.buffer = canvas.BUFFER; // buffer
+    this.canvas = canvas.CANVAS; // canvas
+    this.canvas.stroke();
+    console.log(this.buffer);
+    console.log(this.canvas);
     this.width = Math.ceil(canvas.STAGE_W/canvas.SCALE);
     this.height = Math.ceil(canvas.STAGE_H/canvas.SCALE);
 
-    // this.tile = function(number) { return Math.ceil(number/canvas.TILESIZE); }
 
     // set by map loader
     this.mapWidth =   10;
@@ -26,8 +30,6 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     this.x = function() { return this.camera.x - this.width/2; }
     this.y = function() { return this.camera.y - this.height/2; }
 
-    // console.log(this.tile(this.width)+":"+this.tile(this.height));
-    //   console.log(this.width+":"+this.height);
     this.start = null;
     this.time = null;
 
@@ -64,43 +66,43 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
     if(sprite.isLoaded && (this.debug).includes("draw")) {
       var img = sprite.image;
-      this.canvas.drawImage(img, sx,sy,sw,sh, dx,dy,dw,dh);
+      this.buffer.drawImage(img, sx,sy,sw,sh, dx,dy,dw,dh);
     }
 
     if((this.debug).includes("debug")) {
       var tile = (sprite.name == 'tile' && !(this.debug).includes("all")) ? true : false;
 
-      this.canvas.beginPath();
+      this.buffer.beginPath();
 
       var colour = "green";
 
       if(!sprite.isLoaded) colour = "red";
 
-      this.canvas.strokeStyle = colour;
-      this.canvas.lineWidth = 0.1;
+      this.buffer.strokeStyle = colour;
+      this.buffer.lineWidth = 0.1;
 
       if(!tile){
-        this.canvas.fillStyle = "black";
-        this.canvas.fillRect(dx,dy, dw,5);
+        this.buffer.fillStyle = "black";
+        this.buffer.fillRect(dx,dy, dw,5);
       }
 
       if(sprite.hasOwnProperty('collider')) {
         if(sprite.isLoaded) colour = "blue";
-        this.canvas.strokeStyle = colour;
+        this.buffer.strokeStyle = colour;
 
-        this.canvas.moveTo(dx,dy);
-        this.canvas.lineTo(dx+dw,dy+dh);
-        this.canvas.moveTo(dx,dy+dh);
-        this.canvas.lineTo(dx+dw,dy);
+        this.buffer.moveTo(dx,dy);
+        this.buffer.lineTo(dx+dw,dy+dh);
+        this.buffer.moveTo(dx,dy+dh);
+        this.buffer.lineTo(dx+dw,dy);
       }
-      this.canvas.fillStyle = colour;
-      this.canvas.rect(dx,dy,dw,dh);
+      this.buffer.fillStyle = colour;
+      this.buffer.rect(dx,dy,dw,dh);
 
       if(!tile){
-        this.canvas.font = "2px lucida console";
-        this.canvas.fillText(sprite.name+" "+dx+":"+dy,dx+2,dy+3);
+        this.buffer.font = "2px lucida console";
+        this.buffer.fillText(sprite.name+" "+dx+":"+dy,dx+2,dy+3);
       }
-      this.canvas.stroke();
+      this.buffer.stroke();
     }
   }
 
@@ -192,11 +194,14 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
   // draw the game (thanks to mozilla.org for looping)
   // draws within box of width, height centered on x,y (we will get these from our 'camera')
   Renderer.prototype.draw = function(timestamp) {
+    // continue the loop
+    window.requestAnimationFrame(this.draw.bind(this));
     // setup time measurements
     if(!this.start)
     {
       this.start = timestamp;
     }
+    if(timestamp - this.time < canvas.PHYSICS) { return; }
     this.time = timestamp;
 
     // DEBUG BROADCAST
@@ -204,15 +209,15 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
     if(this.debug != externalDebug) {
       this.debug = externalDebug;
-      this.canvas.fillRect(0,0, canvas.STAGE_W, canvas.STAGE_H);
+      this.buffer.fillRect(0,0, canvas.STAGE_W, canvas.STAGE_H);
     }
     if((this.debug).includes("debug") && !(this.debug).includes("silent") && Math.round((this.start-this.time)/10)%200 == 0) {
       console.log("RENDERER: (" + this.time + ") error count: " + this.errors);
     }
 
-    this.canvas.fillStyle = '#222034';
-    this.canvas.fillRect(0,0,this.width,this.height);
-    // this.canvas.stroke();
+    this.buffer.fillStyle = '#222034';
+    this.buffer.fillRect(0,0,this.width,this.height);
+    // this.buffer.stroke();
 
     // more efficient than drawEntities
     this.drawTiles(this.tilesFloor);
@@ -239,9 +244,7 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     // </DEBUG BINARY SEARCH>
 
     this.drawTiles(this.tilesCeiling);
-
-    // continue the loop
-    window.requestAnimationFrame(this.draw.bind(this));
+    this.canvas.drawImage(this.bufferCanvas,0,0);
   }
 
   Renderer.prototype.addFloorTile = function(tile, index = -1) {

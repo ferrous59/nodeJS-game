@@ -1,6 +1,6 @@
 // creature.js
 // a creature is an entity that can perform actions- such as moving or sneezing
-define(['entity', 'sprites'], function(Entity, sprites) {
+define(['entity', 'sprites', 'constants'], function(Entity, sprites, c) {
   'use strict';
 
   Creature.prototype = new Entity;
@@ -12,14 +12,15 @@ define(['entity', 'sprites'], function(Entity, sprites) {
     this.speed = 0;
     this.speed = 2;
     this.reflexes = 200;
+    this.deltaTime = 1/c.PHYSICS;
 
     if(sprites.hasOwnProperty(name) ) {
       var s   = sprites[name],
           has = function(x) { return s.hasOwnProperty(x); };
 
-      this.speed = has('speed') ? s.speed : 4;
+      this.speed = has('speed') ? s.speed : 16;
       this.direction = has('speed') ? s.speed : 2;  // point S by default
-      this.reflexes = has('reflexes') ? s.reflexes : 2;
+      this.reflexes = has('reflexes') ? s.reflexes : 200;
     }
     else { this.actions = "none"; }
   }
@@ -39,30 +40,30 @@ define(['entity', 'sprites'], function(Entity, sprites) {
     }
   }
 
-  Creature.prototype.walk = function (dir, time = 0) {
-
+  Creature.prototype.walk = function (dir) {
+    // dir can be in the form 0,1,2,3 or N,E,S,W
+    var _dir = (typeof(dir) == 'number') ? direction(dir) : dir;
+    this.setAnim('walk_' + _dir);
     this.direction = dir;
 
     var x = this.speed,
         y = this.speed;
 
     switch (dir) {
-      case 0: x = 0;  y = -y; break;
-      case 1: x = x;  y = 0;  break;
-      case 2: x = 0;  y = y;  break;
-      case 3: x = -x; y = 0;  break;
+      case 0: case 'N': x = 0;  y = -y; break;
+      case 1: case 'E': x = x;  y = 0;  break;
+      case 2: case 'S': x = 0;  y = y;  break;
+      case 3: case 'W': x = -x; y = 0;  break;
       default:
         x = y = 0;
     }
 
-    if( Math.abs(Date.now() - this.lastTick) > this.reflexes*0) { this.move(x,y); }
-    else {console.log(this.lastTick);}
-    this.setAnim('walk_' + direction(dir));
-
+    this.move(x*this.deltaTime,y*this.deltaTime);
   }
 
   Creature.prototype.idle = function () {
-    this.setAnim('idle_' + direction(this.direction));
+    var dir = (typeof(this.direction) == 'number') ? direction(this.direction) : this.direction;
+    this.setAnim('idle_' + dir);
   }
 
   return Creature;
