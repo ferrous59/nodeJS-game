@@ -5,39 +5,60 @@ var path = require('path');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-
 app.use(express.static(path.join(__dirname, '/../public')));
 
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, '../publc/index.html'));
 });
 
-// temporary
-var truePos = 0;
+// FUTURE stuff - the system isn't going to check for no clipping hackers as of yet...
+// not true entities - mererly structs with data
+var entities = [];
 io.on('connection', function(socket){
   console.log('a user has connected:\t\t'+socket.id);
 
-  //setInterval(function(){ io.emit('message', 'welcolme, newcomer'); }, 3000);
-  setInterval(function() {
-    if(truePos <= 50 ){
-    truePos += 1;
-    io.emit('moveCharTo', truePos);
-  }
-  },200);
-  //temporaty
-  socket.on('moveChar', function (x) {
-    if(truePos >= 0) truePos += x;
-    io.emit('moveCharTo', truePos);
+  // a bit clumsy
+  socket.on('requestID', function() {
+    // emits to ONLY the new socket
+    id = entities.length;
+    for(var i = entities.length-1; i > -1; i--) {
+      // will go from length to 0
+      if(entities[i] == null) { id = i; } // exit for loop
+    }
+
+    entities[id] = socket.id;
+    socket.emit('assignID', id);
+    io.emit('changeEntity', id, 'unknown');
+    console.log('user ' + socket.id + ' has been given id: ' + id);
   });
 
-  socket.on('disconnect', function(){
+  socket.on('message', function(message) {
+    console.log(message);
+  });
+
+  socket.on('updateEntity', function(id, pos, anim) {
+    io.emit('updateEntity', id, pos, anim);
+  });
+
+  socket.on('disconnect', function() {
+    // remove the disconnected player's entity
+    for(var j = 0; j < entities.length; j++ ) {
+      if(entities[j] === socket.id) {
+        entities[j] = null;
+        io.emit('nullEntity', j);
+      }
+    }
     console.log('a user has disconnected:\t'+socket.id);
   });
 });
 
-io.on('message', function(message) {
-  console.log(message);
+io.on('updateEntity', function() {
+  console.log( 'grooat');
 });
+
+// io.on('message', function(message) {
+//   console.log(message);
+// });
 
 //app.listen ...
 http.listen(process.env.PORT || 3000, function() {
