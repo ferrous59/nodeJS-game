@@ -8,6 +8,7 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
   var c = require('constants');
   c.SETUP_CANVAS();
   socket.emit('requestID');
+  socket.emit('forceUpdate');
 
   var Renderer = require('renderer');
   var renderer = new Renderer();
@@ -20,6 +21,7 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
 //<TMP>
   var Creature = require('creature');
   var player = -1;  // mererly an index of the player
+  var player_name = 'unknown';
 
   // BUG: changing entity increases your speed somehow. It is weird.
   function setEntity (id, name) {
@@ -52,29 +54,34 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
       login.parentElement.remove();
 
       setEntity(player, name);
-      socket.emit('changeEntity', id, name);
+      player_name = name;
+      socket.emit('changeEntity', player, name);
       gameLoop(0);
     }
   }
 
+  var anim = 'idle_S';
   function gameLoop (time) {
     // continue the loop
     window.requestAnimationFrame(gameLoop);
 
-    var anim = "idle_S";
+    var newAnim;
     if(player != -1) {
       var a = entities[player];
-      if(keys.idle())              { a.idle();    anim = 'idle';}
-      else if(keys.down('walk_N')) { a.walk('N'); anim = 'walk_N';}
-      else if(keys.down('walk_E')) { a.walk('E'); anim = 'walk_E';}
-      else if(keys.down('walk_S')) { a.walk('S'); anim = 'walk_S';}
-      else if(keys.down('walk_W')) { a.walk('W'); anim = 'walk_W';}
+      if(keys.idle())              { a.idle();    newAnim = 'idle';}
+      else if(keys.down('walk_N')) { a.walk('N'); newAnim = 'walk_N';}
+      else if(keys.down('walk_E')) { a.walk('E'); newAnim = 'walk_E';}
+      else if(keys.down('walk_S')) { a.walk('S'); newAnim = 'walk_S';}
+      else if(keys.down('walk_W')) { a.walk('W'); newAnim = 'walk_W';}
     }
 
     if(time - lastUpdate > c.UPDATE) {
       lastUpdate = time;
 
-      socket.emit('updateEntity', player, entities[player].position, anim);
+      if(newAnim != anim) {
+        anim = newAnim;
+        socket.emit('updateEntity', player, entities[player].position, anim);
+      }
     }
   }
 
@@ -136,19 +143,25 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
          _y = 18+Math.round(Math.random()*2-1);
     entities[player].setPos(_x*16,_y*16);
 
-    socket.emit('updateEntity', player, entities[player].position, 'idle_S');
+    socket.emit('updateEntity', player, entities[player].position, 'idle');
   });
 
   socket.on('updateEntity', function(id, pos, anim) {
-    //socket.emit('message', 'hello');
+    if(entities[id] == null) { return; }
 
-    console.log(id);
     entities[id].position = pos;
-    if(anim != 'idle') { entities[id].setAnim(anim); }
+
+    if(anim != 'idle') {
+      entities[id].setAnim(anim);
+
+      var dir = anim.charAt(anim.length-1);
+      if(dir == 'N' || dir == 'E' || dir == 'S' || dir == 'W') entities[id].direction = dir;
+    }
     else { entities[id].idle(); }
   });
 
   socket.on('changeEntity', function(id, name) {
+    console.log('changeEntity:'+id);
     setEntity(id, name); // in future this may need to be more general
   });
 
@@ -158,5 +171,13 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
 
   socket.on('message', function(message) {
     console.log(message);
+  });
+
+  socket.on('forceUpdate', function() {
+    console.log('NETWORK: forced update');
+    if(player != -1) {
+      socket.emit('changeEntity', player, player_name);
+      socket.emit('updateEntity', player, entities[player].position, anim);
+    }
   });
 });

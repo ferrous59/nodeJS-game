@@ -3,7 +3,7 @@
 define(['entity', 'sprites', 'constants'], function(Entity, sprites, c) {
   'use strict';
 
-  Creature.prototype = new Entity;
+  Creature.prototype = new Entity('default');
   Creature.prototype.constructor = Creature;
   function Creature (name) {
     // inherit from entity
@@ -18,7 +18,7 @@ define(['entity', 'sprites', 'constants'], function(Entity, sprites, c) {
           has = function(x) { return s.hasOwnProperty(x); };
 
       this.speed = has('speed') ? s.speed : 16;
-      this.direction = has('speed') ? s.speed : 2;  // point S (outh) by default
+      this.direction = has('direction') ? s.direction : 2;  // point S (outh) by default
       this.reflexes = has('reflexes') ? s.reflexes : 200;
     }
     else { this.actions = "none"; }
@@ -44,7 +44,6 @@ define(['entity', 'sprites', 'constants'], function(Entity, sprites, c) {
     var _dir = (typeof(dir) == 'number') ? direction(dir) : dir;
     this.setAnim('walk_' + _dir);
     this.direction = dir;
-
     var x = this.speed,
         y = this.speed;
 
@@ -62,6 +61,7 @@ define(['entity', 'sprites', 'constants'], function(Entity, sprites, c) {
 
   Creature.prototype.idle = function () {
     var dir = (typeof(this.direction) == 'number') ? direction(this.direction) : this.direction;
+    console.log(typeof(this.direction)+":"+this.direction+":"+dir);
     this.setAnim('idle_' + dir);
   }
 

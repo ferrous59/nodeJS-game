@@ -37,7 +37,15 @@ io.on('connection', function(socket){
   });
 
   socket.on('updateEntity', function(id, pos, anim) {
-    io.emit('updateEntity', id, pos, anim);
+    socket.broadcast.emit('updateEntity', id, pos, anim);
+  });
+
+  socket.on('changeEntity', function(id, name) {
+    socket.broadcast.emit('changeEntity', id, name);
+  });
+
+  socket.on('forceUpdate', function() {
+    io.emit('forceUpdate');
   });
 
   socket.on('disconnect', function() {
@@ -51,14 +59,6 @@ io.on('connection', function(socket){
     console.log('a user has disconnected:\t'+socket.id);
   });
 });
-
-io.on('updateEntity', function() {
-  console.log( 'grooat');
-});
-
-// io.on('message', function(message) {
-//   console.log(message);
-// });
 
 //app.listen ...
 http.listen(process.env.PORT || 3000, function() {

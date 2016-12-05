@@ -6,7 +6,7 @@ define(['sprite','sprites'], function (Sprite,sprites) {
 
   var ID = 0;
 
-  Entity.prototype = new Sprite;
+  Entity.prototype = new Sprite('default');
   Entity.prototype.constructor = Entity;
   function Entity (name) {
     // inherit from sprite
