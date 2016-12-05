@@ -16,8 +16,6 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     this.buffer = canvas.BUFFER; // buffer
     this.canvas = canvas.CANVAS; // canvas
     this.canvas.stroke();
-    console.log(this.buffer);
-    console.log(this.canvas);
     this.width = Math.ceil(canvas.STAGE_W/canvas.SCALE);
     this.height = Math.ceil(canvas.STAGE_H/canvas.SCALE);
 
@@ -114,12 +112,10 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
       if(current == null) { return; }
       var x = self.camera.x,
           y = self.camera.y,
-          xA = x - self.width/2 - current.width,
-          xB = x + self.width/2 + current.width,
-          yA = y - self.height/2 - current.height,
-          yB = y + self.height/2 + current.height;
+          _width = self.width+current.width*2,
+          _height = self.heigh+current.height;
 
-      if(Collision.box(current.position.x,current.position.y, xA,xB, yA,yB) == true)
+      if(Collision.box(current.position.x,current.position.y, x,y, _width,_height) == true)
       {
         self.stamp(current);
       }
@@ -131,14 +127,13 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     var self = this;
 
     unknown.forEach(function(current) {
+      if(current == null) { return; }
       var x = self.camera.x,
           y = self.camera.y,
-          xA = x - self.width/2 - current.width,
-          xB = x + self.width/2 + current.width,
-          yA = y - self.height/2 - current.height,
-          yB = y + self.height/2 + current.height;
+          _width = self.width+current.width*2,
+          _height = self.heigh+current.height;
 
-      if(Collision.box(current.position.x,current.position.y, xA,xB, yA,yB) == true)
+      if(Collision.box(current.position.x,current.position.y, x,y, _width,_height) == true)
       {
         var insert = function(mid, current) {
           visible.splice(mid,0,current);
@@ -260,6 +255,14 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
   Renderer.prototype.addStatic = function(entity) { this.static.push(entity); }
   Renderer.prototype.addEntity = function(entity) { this.entities.push(entity); }
+  Renderer.prototype.nullEntity = function(i) { this.entities[i] = null; }
+  Renderer.prototype.removeEntity = function(entity) {
+    var self = this;
+    for(var i = 0; i < self.entities.length; i++) {
+      if(self.entities[i] === entity) { self.entities.splice(i,1); return; }
+    }
+    console.log('RENDERER: Tried to remove an entity that did\'nee exist...');
+  }
 
   return Renderer;
 });

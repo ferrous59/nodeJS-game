@@ -9,7 +9,7 @@ define(['canvas'], function(Canvas){
     SCALE   : 5,
     PHYSICS : 15, //ms
     UPDATE  : 45, //ms
-    GAME_FONT : "bold 20px sans-serif", // will need to be replaced by custom font
+    GAME_FONT : 'px pixel',//"bold 20px sans-serif", // will need to be replaced by custom font
     BUFFERSTAGE : null,
     STAGE : null,
     BUFFER : null,
@@ -19,6 +19,10 @@ define(['canvas'], function(Canvas){
     // RENDERING
     //---------------
     SETUP_CANVAS : function() {
+      document.documentElement.style.setProperty('--scale', this.SCALE);
+      document.getElementById('login').fontStyle = 6*10*this.SCALE+this.GAME_FONT;
+      document.getElementById('login').fontStyle = 6*10*this.SCALE+this.GAME_FONT;
+
       this.STAGE = document.getElementById("gameCanvas");
       // this.BUFFERSTAGE = document.createElement('CANVAS');
       this.BUFFERSTAGE = document.getElementById('gameBuffer');
@@ -36,8 +40,8 @@ define(['canvas'], function(Canvas){
       // loading screen
       this.CANVAS.fillStyle = "#ffffff";
       this.CANVAS.fillRect(0,0, this.STAGE_W, this.STAGE_H);
-      this.CANVAS.fillStyle = "#000000";
-      this.CANVAS.font = this.GAME_FONT;
+      this.CANVAS.fillStyle = "#222034";
+      this.CANVAS.font = 6*this.SCALE+this.GAME_FONT;
       this.CANVAS.fillText("loading...", this.STAGE_W/2-50, this.STAGE_H/2);
     }
   }

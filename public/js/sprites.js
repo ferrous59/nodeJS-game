@@ -9,6 +9,7 @@ define(['text!JSON/sprites/default.json',
         'text!JSON/sprites/pyromancer.json',
         'text!JSON/sprites/ranger.json',
         'text!JSON/sprites/rogue.json',
+        'text!JSON/sprites/unknown.json',
         // tiles
         'text!JSON/tiles/barrel.json',
         'text!JSON/tiles/barrel1.json',

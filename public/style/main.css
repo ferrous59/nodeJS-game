@@ -1,5 +1,11 @@
+@font-face { font-family: 'pixel'; src: url('pixel.ttf'); }
+
 :root {
   --scale: 0;
+  --inputTextPlaceholder: #696a6a;
+
+  font-family: 'pixel';
+  font-size: calc(7px * var(--scale));
 
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;  /* Firefox */
@@ -15,3 +21,29 @@ body {
   margin:0;
   overflow: hidden;;
 }
+
+#gameBuffer { display: none; }
+#login {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height: calc(16px * var(--scale));
+  padding: calc(2px * var(--scale)) 0 0 calc(2px * var(--scale));
+  font-size: 200%;
+
+  background-color: #9BADB7;
+}
+input {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font:inherit;
+  color: #45283c;
+}
+input:focus { outline: none; }
+::-webkit-input-placeholder { color: var(--inputTextPlaceholder); }
+:-moz-placeholder { /* Firefox 18- */ color: var(--inputTextPlaceholder); }
+::-moz-placeholder {  /* Firefox 19+ */ color: var(--inputTextPlaceholder); }
+:-ms-input-placeholder { color: var(--inputTextPlaceholder); }

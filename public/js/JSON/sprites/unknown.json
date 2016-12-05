@@ -1,0 +1,12 @@
+{
+  "name": "unknown",
+  "src":"unknown.png",
+  "sPosition":{"x":0, "y":0},
+  "width":16,
+  "height":16,
+  "center":{"x":8, "y":8},
+  "collider":{"type":"disc", "radius":8},
+  "animations": {
+    "idle_S":{"row":0,"length":7,"timing":[100]}
+  }
+}

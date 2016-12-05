@@ -10,7 +10,6 @@ define(['entity', 'sprites', 'constants'], function(Entity, sprites, c) {
     Entity.apply(this, arguments);
 
     this.speed = 0;
-    this.speed = 2;
     this.reflexes = 200;
     this.deltaTime = 1/c.PHYSICS;
 
@@ -19,7 +18,7 @@ define(['entity', 'sprites', 'constants'], function(Entity, sprites, c) {
           has = function(x) { return s.hasOwnProperty(x); };
 
       this.speed = has('speed') ? s.speed : 16;
-      this.direction = has('speed') ? s.speed : 2;  // point S by default
+      this.direction = has('speed') ? s.speed : 2;  // point S (outh) by default
       this.reflexes = has('reflexes') ? s.reflexes : 200;
     }
     else { this.actions = "none"; }

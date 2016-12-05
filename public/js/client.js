@@ -1,15 +1,17 @@
 //define(['constants', 'game', 'entity'], function(c,g,e) {
 
-define(['constants', 'renderer', 'map', 'sprite', 'entity', 'creature'], function() {
+define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature'], function() {
   /*automatic: var socket = io.connect('http://localhost:3000');*/
   "use strict";
 
   // SETUP
   var c = require('constants');
   c.SETUP_CANVAS();
+  socket.emit('requestID');
 
   var Renderer = require('renderer');
   var renderer = new Renderer();
+  var entities = renderer.entities;
 
   var SpriteMap = require('map');
   var map = new SpriteMap('map' );
@@ -17,25 +19,63 @@ define(['constants', 'renderer', 'map', 'sprite', 'entity', 'creature'], functio
 
 //<TMP>
   var Creature = require('creature');
-  var player = new Creature('bard');
+  var player = -1;  // mererly an index of the player
 
-  renderer.camera = player.position;
+  // BUG: changing entity increases your speed somehow. It is weird.
+  function setEntity (id, name) {
+    var entity= entities[id],
+        pos = (entity != null) ? entity.position : {'x':0, 'y':0};
+    entities[id] = new Creature(name);
+    entities[id].position = pos;
+
+    if(id == player) { renderer.camera = entities[id].position }
+  }
 
   var fps = 60,
       spf = 1000 / fps;
 
 
+  // 'update' loop is seperate - and is used to talk to the server
+  var lastUpdate = 0;
+  var id = -1;
+
+  // hand the user control once they pick a sprite
+  var spriteList = require('sprites');
+
+  // set behaviour for text input
+  var login = document.getElementById('login_text');
+  login.oninput = function () {
+    name = login.value;
+
+    if(spriteList.hasOwnProperty(name)) {
+      console.log(name);
+      login.parentElement.remove();
+
+      setEntity(player, name);
+      socket.emit('changeEntity', id, name);
+      gameLoop(0);
+    }
+  }
+
   function gameLoop (time) {
     // continue the loop
     window.requestAnimationFrame(gameLoop);
 
-    if(keys.idle())         { player.idle(); }
-    else if(keys.down('walk_N')) { player.walk('N'); }
-    else if(keys.down('walk_E')) { player.walk('E'); }
-    else if(keys.down('walk_S')) { player.walk('S'); }
-    else if(keys.down('walk_W')) { player.walk('W'); }
+    var anim = "idle_S";
+    if(player != -1) {
+      var a = entities[player];
+      if(keys.idle())              { a.idle();    anim = 'idle';}
+      else if(keys.down('walk_N')) { a.walk('N'); anim = 'walk_N';}
+      else if(keys.down('walk_E')) { a.walk('E'); anim = 'walk_E';}
+      else if(keys.down('walk_S')) { a.walk('S'); anim = 'walk_S';}
+      else if(keys.down('walk_W')) { a.walk('W'); anim = 'walk_W';}
+    }
 
+    if(time - lastUpdate > c.UPDATE) {
+      lastUpdate = time;
 
+      socket.emit('updateEntity', player, entities[player].position, anim);
+    }
   }
 
   var keys = {
@@ -64,9 +104,6 @@ define(['constants', 'renderer', 'map', 'sprite', 'entity', 'creature'], functio
     keys.release(e.keyCode);
   });
 
-  renderer.addEntity(player);
-  player.setPos(6*16,18*16);
-
 //</TMP>
 
   function inuputHandler(key, out, set) {
@@ -87,17 +124,39 @@ define(['constants', 'renderer', 'map', 'sprite', 'entity', 'creature'], functio
   }
 
   // NETWORK
-  socket.on('connect', function() {
+  socket.on('connection', function() {
     console.log('client connected');
   });
 
-  socket.on('update', function(text) {
-    console.log(text);
+  socket.on('assignID', function(_id) {
+    player = _id;
+    setEntity(player, 'unknown');
+
+    var _x = 6+Math.round(Math.random()*2-1),
+         _y = 18+Math.round(Math.random()*2-1);
+    entities[player].setPos(_x*16,_y*16);
+
+    socket.emit('updateEntity', player, entities[player].position, 'idle_S');
+  });
+
+  socket.on('updateEntity', function(id, pos, anim) {
+    //socket.emit('message', 'hello');
+
+    console.log(id);
+    entities[id].position = pos;
+    if(anim != 'idle') { entities[id].setAnim(anim); }
+    else { entities[id].idle(); }
+  });
+
+  socket.on('changeEntity', function(id, name) {
+    setEntity(id, name); // in future this may need to be more general
+  });
+
+  socket.on('nullEntity', function(id) {
+    renderer.nullEntity(id);
   });
 
   socket.on('message', function(message) {
     console.log(message);
   });
-
-  gameLoop(0);
 });
