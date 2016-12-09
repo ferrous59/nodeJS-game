@@ -117,31 +117,3 @@ define(['sprites'], function (Sprites) {
 
   return Sprite;
 });
-
-// define(['canvas'], function (Canvas) {
-//   // handles animations.
-//   // outputs a 'canvas' that we entity/other can draw at a position with drawImage
-//   var sprite ="";
-//   //var initSprite = {
-//     //init: function(data) {
-//     function init (data) {
-//       this.stage = document.createElement('canvas');
-//       this.stage.width = data.sW;
-//       this.stage.height = data.sH;
-//
-//       this.canvas = new Canvas(this.stage);
-//       this.img = new Image();
-//       this.img.src = data.src;
-//     /*},
-//     draw: function(dX,dY)
-//     {*/
-//       this.canvas.drawImage(this.img,
-//         dX, dY, data.sW, data.sH,
-//         0,  0,  data.sW*c.SCALE, data.sH*c.SCALE
-//       );
-//
-//       sprite = this.canvas;
-//     //}
-//   }
-//   return sprite;
-// });

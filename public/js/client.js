@@ -81,7 +81,8 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
 
       if(newAnim != anim || entities[player].position != oldPos) {
         anim = newAnim;
-        oldPos = entities[player].position;
+        oldPos.x = entities[player].position.x;
+        oldPos.y = entities[player].position.y;
         socket.emit('updateEntity', player, entities[player].position, anim);
       }
     }
@@ -182,4 +183,13 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
       socket.emit('updateEntity', player, entities[player].position, anim);
     }
   });
+
+  noclip = function internalNoclip(id = player) {
+    if(id == null || entities[id] == null) { return 'error'; }
+    else { entities[id].noclip = (entities[id].noclip == true) ? false : true; }
+    console.log('NOCLIP:' + entities[id].name);
+    return entities[id].noclip;
+  };
 });
+
+function noclip () { }
