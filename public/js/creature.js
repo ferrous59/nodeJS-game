@@ -61,7 +61,6 @@ define(['entity', 'sprites', 'constants'], function(Entity, sprites, c) {
 
   Creature.prototype.idle = function () {
     var dir = (typeof(this.direction) == 'number') ? direction(this.direction) : this.direction;
-    console.log(typeof(this.direction)+":"+this.direction+":"+dir);
     this.setAnim('idle_' + dir);
   }
 

@@ -61,6 +61,7 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
   }
 
   var anim = 'idle_S';
+  var oldPos = {"x":-1,"y":-1};
   function gameLoop (time) {
     // continue the loop
     window.requestAnimationFrame(gameLoop);
@@ -78,8 +79,9 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
     if(time - lastUpdate > c.UPDATE) {
       lastUpdate = time;
 
-      if(newAnim != anim) {
+      if(newAnim != anim || entities[player].position != oldPos) {
         anim = newAnim;
+        oldPos = entities[player].position;
         socket.emit('updateEntity', player, entities[player].position, anim);
       }
     }
