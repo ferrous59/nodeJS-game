@@ -1,6 +1,6 @@
 //define(['constants', 'game', 'entity'], function(c,g,e) {
 
-define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature'], function() {
+define(['constants', 'collision', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature'], function() {
   /*automatic: var socket = io.connect('http://localhost:3000');*/
   "use strict";
 
@@ -9,6 +9,8 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
   c.SETUP_CANVAS();
   socket.emit('requestID');
   socket.emit('forceUpdate');
+
+  var Collision = require('collision');
 
   var Renderer = require('renderer');
   var renderer = new Renderer();
@@ -25,17 +27,23 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
 
   // BUG: changing entity increases your speed somehow. It is weird.
   function setEntity (id, name) {
-    var entity= entities[id],
-        pos = (entity != null) ? entity.position : {'x':0, 'y':0};
+    var pos = (entities[id] != null) ? entities[id].position : {'x':0, 'y':0};
+
+    // cleanup
+    renderer.nullEntity(id);
+
+    // create a player
     entities[id] = new Creature(name);
-    entities[id].position = pos;
+
+    var entity = entities[id];
+    entity.position.x = pos.x;
+    entity.position.y = pos.y;
 
     if(id == player) { renderer.camera = entities[id].position }
   }
 
   var fps = 60,
       spf = 1000 / fps;
-
 
   // 'update' loop is seperate - and is used to talk to the server
   var lastUpdate = 0;
@@ -140,19 +148,29 @@ define(['constants', 'renderer', 'map', 'sprite', 'sprites', 'entity', 'creature
 
   socket.on('assignID', function(_id) {
     player = _id;
+    // entities.splice(_id, 0, null);
+console.log(_id+'k'+entities.length);
+    entities.splice(_id, 0, null);
+    console.log(entities.length);
     setEntity(player, 'unknown');
 
-    var _x = 6+Math.round(Math.random()*2-1),
-         _y = 18+Math.round(Math.random()*2-1);
-    entities[player].setPos(_x*16,_y*16);
+    var scale = require('constants').TILESIZE,
+        _x = (6+Math.random()*4-1)*scale,
+        _y = (18.5+Math.random()*2-1)*scale;
 
+    entities[player].setPos(_x,_y);
     socket.emit('updateEntity', player, entities[player].position, 'idle');
   });
 
   socket.on('updateEntity', function(id, pos, anim) {
     if(entities[id] == null) { return; }
 
-    entities[id].position = pos;
+    // clamp incoming entities to nearest integer (prevents wobble effect)
+    pos.x = Math.round(pos.x);
+    pos.y = Math.round(pos.y);
+    entities[id].position.x = pos.x;
+    entities[id].position.y = pos.y;
+    // entities[id].moveTo(pos.x, pos.y);
 
     if(anim != 'idle') {
       entities[id].setAnim(anim);

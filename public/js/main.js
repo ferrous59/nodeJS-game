@@ -8,7 +8,6 @@ require.config({
 
 var client = require(['client'], function(){
   console.log('game loaded');
-
 });
 
 function debugMode(bool) {

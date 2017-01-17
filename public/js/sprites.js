@@ -24,7 +24,8 @@ define(['text!JSON/sprites/default.json',
         'text!JSON/tiles/table.json',
         'text!JSON/tiles/table1.json',
         'text!JSON/tiles/table2.json',
-        'text!JSON/tiles/tile.json'], function () {
+        'text!JSON/tiles/tile.json'
+      ], function () {
 
   var sprites = {};
   var dependencies = Array.prototype.slice.call(arguments);

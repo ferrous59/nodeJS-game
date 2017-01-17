@@ -1,7 +1,7 @@
 // entity.js
 // entities must be able to move, respecting collision
 // entities must be able to spawn/despawn
-define(['sprite','sprites'], function (Sprite,sprites) {
+define(['sprite','sprites','collision'], function (Sprite, sprites, Collision) {
   'use strict';
 
   var ID = 0;
@@ -19,31 +19,75 @@ define(['sprite','sprites'], function (Sprite,sprites) {
     function has( property ) {
       return (sprites.hasOwnProperty(name)) ? sprites[name].hasOwnProperty(property) : false;
     }
-    this.collider = has('collider') ? sprites[name].collider : "none";
-    this.noclip = has('noclip') ? sprites[name].noclip : false;
 
+    if(has('collider')) {
+      var Collision = require('collision');
+
+      this.collider = sprites[name].collider;
+      if(this.collider.type == "disc") { this.collider = Collision.discCollider(this); }
+      else if(this.collider.type == 'box') { this.collider = Collision.boxCollider(this); }
+      Collision.add(this.collider);
+    }
+    else { this.collider = null; }
+
+    this.noclip = has('noclip') ? sprites[name].noclip : false;
   };
 
-  Entity.prototype.move = function(x, y) {
+  Entity.prototype.safe = function(x,y) {
+    if( !this.collision(x,y) ) {
+      this.position.x += x;
+      this.position.y += y;
+      return true;
+    }
+    return false;
+  }
+  // just sends you backwards - useful for when x != 0 && y != 0
+  Entity.prototype.basicMove = function(x,y) {
     var tries = 0,
-        dirX = x-this.position.x,
-        dirY = y-this.position.y;
-    while(tries < 10)
-    {
-      if( !this.collision(x,y) ) {
-        this.position.x += x;
-        this.position.y += y;
-        return;
-      }
+        max = 10,
+        _x = x,
+        _y = y;
+    while(tries < max) {
+      if(this.safe(x,y)){ return; }
       else {
-        x -= dirX/10;
-        y -= dirY/10;
+        _x = x/(max-tries);
+        _y = y/(max-tries);
         tries++;
       }
     }
-    // BASIC
-    // this.position.x += x;
-    // this.position.y += y;
+  }
+
+  Entity.prototype.move = function(x, y) {
+    // clumsy but simple - if entity is stuck in something, move freely
+    if(this.collision(0, 0)) {
+      this.position.x += x;
+      this.position.y += y;
+      console.log(this.name + ' was stuck in a collider');
+      return;
+    }
+    if(this.safe(x,y)) { return; }
+
+    if(x*y != 0) { basicMove(x,y); return; }
+
+    var tries = 0,
+        max = 10,
+        _x = x,
+        _y = y;
+
+    while(tries < max) {
+      if(this.safe(_x,_y)) { return; }
+      else {
+        var sign = (tries % 2 == 0) ? 1 : -1,
+            angle = Math.PI*2/20*(tries+1)*sign;
+        _x = x*Math.cos(angle) - y*Math.sin(angle);
+        _y = x*Math.sin(angle) + y*Math.cos(angle);
+        if(x == 0) { _y = y/(tries+1); }
+        else       { _x = x/(tries+1); }
+        // if(x == 0) { _x = y/(max-tries)*sign; _y = y/(tries+1); }
+        // else       { _y = x/(max-tries)*sign; _x = x/(tries+1); }
+        tries++;
+      }
+    }
   }
 
   Entity.prototype.setPosition = function(x,y) {
@@ -54,10 +98,16 @@ define(['sprite','sprites'], function (Sprite,sprites) {
   }
 
   Entity.prototype.collision = function(x,y) {
-    if(this.noclip != true) { return false; }
+    if(this.noclip == true || this.collider == null) { return false; }
 
-    // search for nearby colliders
-    return false;
+    // search for nearby colliders by asking collision.js to do it.
+    var dest = this.collider,
+        tmp = dest.position;
+    dest.position = {x:tmp.x+x, y:tmp.y+y};
+
+    var result = Collision.checkAll(dest);
+    dest.position = tmp;
+    return result;
   };
 
   Entity.prototype.emit = function() {

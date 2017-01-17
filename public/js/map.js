@@ -1,5 +1,5 @@
 // Used to load map files that are exported by 'tilemapper'
-define(['renderer', 'sprite',
+define(['renderer', 'sprite', 'entity',
         'text!JSON/maps/tavern.json'], function() {
 
   function SpriteMap (name = 'unknown')
@@ -34,17 +34,22 @@ define(['renderer', 'sprite',
       var tile = layer.data[i] -1;
 
       if( tile > -1 ) {
+        var Entity = require('entity');
         var Sprite = require('sprite');
 
         // this one line business is a bit indulgent, but I just learned about ternarys!
         var name = this.customTiles != null && this.customTiles.hasOwnProperty(tile) ? this.customTiles[tile] : 'tile';
         if(name == '0') { continue; }
 
-        var sprite = new Sprite(name),
-            x = i % layer.width,
+        var sprite = new Entity(name);
+        if(sprite.collider == null) { sprite = new Sprite(name); }
+
+        var x = i % layer.width,
             y = (i-x) / layer.width,
             sx = tile % sprite.width,
             sy = (tile-sx) / sprite.width;
+
+
 
         x  *= this.spriteWidth;
         sx *= this.spriteWidth;

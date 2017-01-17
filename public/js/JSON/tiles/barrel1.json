@@ -4,5 +4,7 @@
   "position":{"x":0, "y":0},
   "sPosition":{"x":160, "y":112},
   "width":16,
-  "height":16
+  "height":16,
+  "center":{"x":8, "y":8},
+  "collider":{"type":"disc", "radius":6}
 }

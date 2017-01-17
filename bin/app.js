@@ -28,7 +28,7 @@ io.on('connection', function(socket){
 
     entities[id] = socket.id;
     socket.emit('assignID', id);
-    io.emit('changeEntity', id, 'unknown');
+    socket.broadcast.emit('changeEntity', id, 'unknown');
     console.log('user ' + socket.id + ' has been given id: ' + id);
   });
 
@@ -44,8 +44,12 @@ io.on('connection', function(socket){
     socket.broadcast.emit('changeEntity', id, name);
   });
 
+  socket.on('nullEntity', function(id, name) {
+    socket.broadcast.emit('nullEntity', id, name);
+  });
+
   socket.on('forceUpdate', function() {
-    io.emit('forceUpdate');
+    socket.broadcast.emit('forceUpdate');
   });
 
   socket.on('disconnect', function() {

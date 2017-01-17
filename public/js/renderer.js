@@ -62,45 +62,48 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
       sy += sprite.animation.row * sprite.height;
     }
 
+    var buffer = this.buffer;
+
     if(sprite.isLoaded && (this.debug).includes("draw")) {
       var img = sprite.image;
-      this.buffer.drawImage(img, sx,sy,sw,sh, dx,dy,dw,dh);
+      buffer.drawImage(img, sx,sy,sw,sh, dx,dy,dw,dh);
     }
 
     if((this.debug).includes("debug")) {
       var tile = (sprite.name == 'tile' && !(this.debug).includes("all")) ? true : false;
 
-      this.buffer.beginPath();
+      buffer.beginPath();
 
       var colour = "green";
 
       if(!sprite.isLoaded) colour = "red";
 
-      this.buffer.strokeStyle = colour;
-      this.buffer.lineWidth = 0.1;
+      buffer.strokeStyle = colour;
+      buffer.lineWidth = 0.2;
 
       if(!tile){
-        this.buffer.fillStyle = "black";
-        this.buffer.fillRect(dx,dy, dw,5);
+        buffer.fillStyle = "black";
+        buffer.fillRect(dx,dy, dw,5);
       }
-
       if(sprite.hasOwnProperty('collider')) {
         if(sprite.isLoaded) colour = "blue";
-        this.buffer.strokeStyle = colour;
+        else colour = "purple";
+        buffer.strokeStyle = colour;
 
-        this.buffer.moveTo(dx,dy);
-        this.buffer.lineTo(dx+dw,dy+dh);
-        this.buffer.moveTo(dx,dy+dh);
-        this.buffer.lineTo(dx+dw,dy);
+        buffer.rect(dx,dy,dw,dh);
+        buffer.moveTo(dx,dy);
+        buffer.lineTo(dx+dw,dy+dh);
+        buffer.moveTo(dx,dy+dh);
+        buffer.lineTo(dx+dw,dy);
       }
-      this.buffer.fillStyle = colour;
-      this.buffer.rect(dx,dy,dw,dh);
+      else { buffer.rect(dx,dy,dw,dh); }
 
       if(!tile){
-        this.buffer.font = "2px lucida console";
-        this.buffer.fillText(sprite.name+" "+dx+":"+dy,dx+2,dy+3);
+        buffer.font = "2px lucida console";
+        buffer.fillStyle = colour;
+        buffer.fillText(sprite.name+" "+dx+":"+dy,dx+2,dy+3);
       }
-      this.buffer.stroke();
+      buffer.stroke();
     }
   }
 
@@ -204,6 +207,10 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
     if(this.debug != externalDebug) {
       this.debug = externalDebug;
+
+      // list active colliders - useful for manipulating values
+      if(this.debug.includes('collider')) { console.log(Collision.collidersList); }
+
       this.buffer.fillRect(0,0, canvas.STAGE_W, canvas.STAGE_H);
     }
     if((this.debug).includes("debug") && !(this.debug).includes("silent") && Math.round((this.start-this.time)/10)%200 == 0) {
@@ -239,6 +246,29 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     // </DEBUG BINARY SEARCH>
 
     this.drawTiles(this.tilesCeiling);
+
+    // draw colliders
+    if((this.debug).includes("debug")) {
+      var buffer = this.buffer;
+
+      buffer.strokeStyle = 'yellow';
+      for(var i = 0; i < Collision.collidersList.length; i++){
+        // draw each collider
+        var collider = Collision.collidersList[i];
+        buffer.beginPath();
+        if(collider.type == 'disc') {
+          buffer.arc(collider.X()-this.x(), collider.Y()-this.y(), collider.radius, 0, 2*Math.PI);
+        }
+        if(collider.type == 'box') {
+          buffer.arc(collider.X()-this.x()-collider.width/2, collider.Y()-this.y()-collider.height/2, collider.width, collider.height);
+        }
+        buffer.font = "2px lucida console";
+        buffer.fillStyle = 'yellow';
+        buffer.fillText(i, collider.X()-this.x()-1, collider.Y()-this.y()+1);
+        buffer.stroke();
+      }
+    }
+
     this.canvas.drawImage(this.bufferCanvas,0,0);
   }
 
@@ -255,7 +285,11 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
   Renderer.prototype.addStatic = function(entity) { this.static.push(entity); }
   Renderer.prototype.addEntity = function(entity) { this.entities.push(entity); }
-  Renderer.prototype.nullEntity = function(i) { this.entities[i] = null; }
+  Renderer.prototype.nullEntity = function(i) {
+    if(this.entities[i] == null) { return; }
+    if(this.entities[i].collider != null) { Collision.remove(this.entities[i].collider.ID); }
+    this.entities[i] = null;
+  }
   Renderer.prototype.removeEntity = function(entity) {
     var self = this;
     for(var i = 0; i < self.entities.length; i++) {
@@ -268,4 +302,7 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 });
 
 var externalDebug = "draw";
-function debug(foo) { externalDebug = foo; return foo; };
+function debug(foo) {
+  externalDebug = foo;
+  return foo;
+};
