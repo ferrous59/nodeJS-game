@@ -4,5 +4,6 @@
   "position":{"x":0, "y":0},
   "sPosition":{"x":192, "y":64},
   "width":16,
-  "height":32
+  "height":32,
+  "collider":{"type":"box", "width":14, "height":8, "centre":{"x":8, "y":28}}
 }

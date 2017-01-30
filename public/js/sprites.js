@@ -13,6 +13,7 @@ define(['text!JSON/sprites/default.json',
         // tiles
         'text!JSON/tiles/barrel.json',
         'text!JSON/tiles/barrel1.json',
+        'text!JSON/tiles/bookshelf.json',
         'text!JSON/tiles/box.json',
         'text!JSON/tiles/box1.json',
         'text!JSON/tiles/chest.json',

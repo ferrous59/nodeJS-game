@@ -4,5 +4,6 @@
   "position":{"x":0, "y":0},
   "sPosition":{"x":192, "y":96},
   "width":32,
-  "height":32
+  "height":32,
+  "z_index":-1
 }

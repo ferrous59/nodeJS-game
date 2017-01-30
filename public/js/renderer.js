@@ -148,7 +148,8 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
               min = 0,
               offset = 0,
               mid = 0,
-              z = current.position.y + current.height,
+              z_index = current.z_index,
+              z = current.position.y + current.height + 1000*z_index,
               z_mid = 0,
               kMax = 100;
 
@@ -156,7 +157,7 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
             mid = min + Math.floor((max-min)/2); // must round down
 
-            z_mid = visible[mid].position.y + visible[mid].height;
+            z_mid = visible[mid].position.y + visible[mid].height + 1000*visible[mid].z_index;
 
             // success
             if(max == min || z_mid == z || k == kMax-1) {
@@ -164,9 +165,9 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
 
               insert(final, current);
               k = kMax;
-             }
+            }
 
-            if(z_mid > z )
+            if(z_mid > z)
             {
               max = (mid > 0) ? mid-1 : 0;
             }
@@ -248,7 +249,7 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
     this.drawTiles(this.tilesCeiling);
 
     // draw colliders
-    if((this.debug).includes("debug")) {
+    if((this.debug).includes("debug") || (this.debug).includes('collider')) {
       var buffer = this.buffer;
 
       buffer.strokeStyle = 'yellow';
@@ -260,7 +261,7 @@ define(['sprite', 'entity', 'collision', 'constants'], function (Sprite, Entity,
           buffer.arc(collider.X()-this.x(), collider.Y()-this.y(), collider.radius, 0, 2*Math.PI);
         }
         if(collider.type == 'box') {
-          buffer.arc(collider.X()-this.x()-collider.width/2, collider.Y()-this.y()-collider.height/2, collider.width, collider.height);
+          buffer.rect(collider.X()-this.x()-collider.width/2, collider.Y()-this.y()-collider.height/2, collider.width, collider.height);
         }
         buffer.font = "2px lucida console";
         buffer.fillStyle = 'yellow';

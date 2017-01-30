@@ -21,12 +21,26 @@ define(['sprite','sprites','collision'], function (Sprite, sprites, Collision) {
     }
 
     if(has('collider')) {
-      var Collision = require('collision');
+      var Collision = require('collision'),
+          collider = sprites[name].collider;
 
-      this.collider = sprites[name].collider;
-      if(this.collider.type == "disc") { this.collider = Collision.discCollider(this); }
-      else if(this.collider.type == 'box') { this.collider = Collision.boxCollider(this); }
-      Collision.add(this.collider);
+      if(typeof collider.length != 'undefined')
+      {
+        this.collider = null; // bit of a hack. nothing with more than one collider can be dynamic
+        for(var i = 0; i < collider.length; i++)
+        {
+          this.collider = collider;
+          if(collider[i].type == "disc") { Collision.add(Collision.discCollider(this, collider[i])); }
+          else if(collider[i].type == 'box') { Collision.add(Collision.boxCollider(this, collider[i])); }
+        }
+      }
+      else
+      {
+        this.collider = collider;
+        if(collider.type == "disc") { this.collider = Collision.discCollider(this); }
+        else if(collider.type == 'box') { this.collider = Collision.boxCollider(this); }
+        Collision.add(this.collider);
+      }
     }
     else { this.collider = null; }
 

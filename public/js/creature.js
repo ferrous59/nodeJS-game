@@ -39,13 +39,13 @@ define(['entity', 'sprites', 'constants'], function(Entity, sprites, c) {
     }
   }
 
-  Creature.prototype.walk = function (dir) {
+  Creature.prototype.walk = function (dir, sprint = 1) {
     // dir can be in the form 0,1,2,3 or N,E,S,W
     var _dir = (typeof(dir) == 'number') ? direction(dir) : dir;
     this.setAnim('walk_' + _dir);
     this.direction = dir;
-    var x = this.speed,
-        y = this.speed;
+    var x = this.speed*sprint,
+        y = this.speed*sprint;
 
     switch (dir) {
       case 0: case 'N': x = 0;  y = -y; break;

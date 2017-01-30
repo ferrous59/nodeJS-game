@@ -1,5 +1,5 @@
 // Used to load map files that are exported by 'tilemapper'
-define(['renderer', 'sprite', 'entity',
+define(['renderer', 'collision', 'sprite', 'entity',
         'text!JSON/maps/tavern.json'], function() {
 
   function SpriteMap (name = 'unknown')
@@ -22,7 +22,34 @@ define(['renderer', 'sprite', 'entity',
     // for(var i = 0; i < data.layers.length; i++) {
     for(var i = (data.layers.length-1); i > -1; i-- ) {
         var layer = data.layers[i];
-        this.loadTiles(layer, layer.name);
+        if(layer.name.includes('collision'))
+        {
+          this.loadColliders(layer);
+        }
+        else {
+          this.loadTiles(layer, layer.name);
+        }
+    }
+  }
+  // this looks pretty odd because it is converting from an exported json from a tile program
+  SpriteMap.prototype.loadColliders = function (layer) {
+    for(var i = 0; i < layer.objects.length; i++) {
+      var Collision = require('collision'),
+          current = layer.objects[i],
+          collider = null,
+          position = {"x": current.x, "y":current.y},
+          offset = {"x": current.width/2, "y":current.height/2},
+          width = current.width,
+          height = current.height;
+
+      if(current.type = 'box') {
+        collider = Collision.rawBoxCollider(position, offset, width, height);
+      }
+      else if (current.type = 'disc') {
+        collider = Collision.rawDiscCollider(position, offset, width);
+      }
+
+      if(collider != null) { Collision.add(collider); }
     }
   }
 

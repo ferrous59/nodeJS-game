@@ -4,8 +4,7 @@
   "sPosition":{"x":0, "y":0},
   "width":16,
   "height":16,
-  "center":{"x":8, "y":8},
-  "collider":{"type":"disc", "radius":8},
+  "collider":{"type":"disc", "radius":5,"centre":{"x":8, "y":11}},
   "animations": {
     "idle_N":{"row":0,"length":1,"timing":[200]},
     "idle_E":{"row":1,"length":1,"timing":[200]},

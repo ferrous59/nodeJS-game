@@ -76,12 +76,14 @@ define(['constants', 'collision', 'renderer', 'map', 'sprite', 'sprites', 'entit
 
     var newAnim;
     if(player != -1) {
-      var a = entities[player];
-      if(keys.idle())              { a.idle();    newAnim = 'idle';}
-      else if(keys.down('walk_N')) { a.walk('N'); newAnim = 'walk_N';}
-      else if(keys.down('walk_E')) { a.walk('E'); newAnim = 'walk_E';}
-      else if(keys.down('walk_S')) { a.walk('S'); newAnim = 'walk_S';}
-      else if(keys.down('walk_W')) { a.walk('W'); newAnim = 'walk_W';}
+      var a = entities[player],
+          run = (keys.down('run')) ? 1.5 : 1 ;
+
+      if(keys.idle())              { a.idle(); newAnim = 'idle';}
+      else if(keys.down('walk_N')) { a.walk('N', run); newAnim = 'walk_N';}
+      else if(keys.down('walk_E')) { a.walk('E', run); newAnim = 'walk_E';}
+      else if(keys.down('walk_S')) { a.walk('S', run); newAnim = 'walk_S';}
+      else if(keys.down('walk_W')) { a.walk('W', run); newAnim = 'walk_W';}
     }
 
     if(time - lastUpdate > c.UPDATE) {
@@ -136,6 +138,8 @@ define(['constants', 'collision', 'renderer', 'map', 'sprite', 'sprites', 'entit
       case 39: case 68: case 102: return change('walk_E'); break;
       case 40: case 83: case 98:  return change('walk_S'); break;
       case 37: case 65: case 100: return change('walk_W'); break;
+
+      case 16: return change('run'); break;
 
       default: return false;
     }

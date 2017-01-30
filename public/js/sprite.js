@@ -26,7 +26,8 @@ define(['sprites'], function (Sprites) {
 
     this.width = data.width;
     this.height = data.height;
-    this.center = data.center;
+    this.z_index = data.z_index || 0;
+    this.centre = data.centre;
 
     // image loading
     this.isLoaded = false;

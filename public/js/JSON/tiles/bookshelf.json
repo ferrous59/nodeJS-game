@@ -1,0 +1,9 @@
+{
+  "name": "bookshelf",
+  "src":"tiles.png",
+  "position":{"x":0, "y":0},
+  "sPosition":{"x":128, "y":96},
+  "width":32,
+  "height":32,
+  "collider":{"type":"box", "width":32, "height":4, "centre":{"x":16, "y":24}}
+}
